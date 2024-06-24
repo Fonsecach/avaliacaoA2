@@ -1,8 +1,24 @@
 ### Listar todas as tarefas
-GET http://localhost:5273/tarefas/listar
+GET http://localhost:5000/tarefas/listar
+
+### Listar todas as tarefas não concluídas
+GET http://localhost:5000/tarefas/naoconcluidas
+
+### Listar todas as tarefas concluídas
+GET http://localhost:5000/tarefas/concluidas
 
 ### Cadastrar uma nova tarefa
-POST http://localhost:5273/tarefas/cadastrar
+POST http://localhost:5000/tarefas/cadastrar
+Content-Type: application/json
+
+{
+    "titulo": "Estudar .NET",
+    "descricao": "Estudar para desenvolver WEB APIs",
+    "categoriaId": "6d091456-5a2f-4b5a-98fc-f1a3b50a627d"
+}
+
+### Cadastrar uma nova tarefa
+POST http://localhost:5000/tarefas/cadastrar
 Content-Type: application/json
 
 {
@@ -10,3 +26,7 @@ Content-Type: application/json
     "descricao": "Estudar Node.js para desenvolver aplicações web",
     "categoriaId": "6d091456-5a2f-4b5a-98fc-f1a3b50a627d"
 }
+
+### Alterar uma tarefa
+PATCH http://localhost:5000/tarefas/alterar/6a8b3e4d-5e4e-4f7e-bdc9-9181e456ad0e
+Content-Type: application/json

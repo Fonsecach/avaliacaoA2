@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDataContext>();
-builder.Services.AddCors(options => {
+builder.Services.AddCors(options =>
+{
     options.AddPolicy("AcessoTotal",
     builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
@@ -14,7 +15,7 @@ var app = builder.Build();
 app.MapGet("/", () => "Prova A1");
 
 //ENDPOINTS DE CATEGORIA
-//GET: http://localhost:5273/categoria/listar
+//GET: http://localhost:5000/categoria/listar
 app.MapGet("/categoria/listar", ([FromServices] AppDataContext ctx) =>
 {
     if (ctx.Categorias.Any())
@@ -24,7 +25,7 @@ app.MapGet("/categoria/listar", ([FromServices] AppDataContext ctx) =>
     return Results.NotFound("Nenhuma categoria encontrada");
 });
 
-//POST: http://localhost:5273/categoria/cadastrar
+//POST: http://localhost:5000/categoria/cadastrar
 app.MapPost("/categoria/cadastrar", ([FromServices] AppDataContext ctx, [FromBody] Categoria categoria) =>
 {
     ctx.Categorias.Add(categoria);
@@ -33,7 +34,7 @@ app.MapPost("/categoria/cadastrar", ([FromServices] AppDataContext ctx, [FromBod
 });
 
 //ENDPOINTS DE TAREFA
-//GET: http://localhost:5273/tarefas/listar
+//GET: http://localhost:5000/tarefas/listar
 app.MapGet("/tarefas/listar", ([FromServices] AppDataContext ctx) =>
 {
     if (ctx.Tarefas.Any())
@@ -43,7 +44,7 @@ app.MapGet("/tarefas/listar", ([FromServices] AppDataContext ctx) =>
     return Results.NotFound("Nenhuma tarefa encontrada");
 });
 
-//POST: http://localhost:5273/tarefas/cadastrar
+//POST: http://localhost:5000/tarefas/cadastrar
 app.MapPost("/tarefas/cadastrar", ([FromServices] AppDataContext ctx, [FromBody] Tarefa tarefa) =>
 {
     Categoria? categoria = ctx.Categorias.Find(tarefa.CategoriaId);
@@ -57,7 +58,7 @@ app.MapPost("/tarefas/cadastrar", ([FromServices] AppDataContext ctx, [FromBody]
     return Results.Created("", tarefa);
 });
 
-// PATCH: http://localhost:5273/tarefas/alterar/{id}
+// PATCH: http://localhost:5000/tarefas/alterar/{id}
 app.MapPatch("/tarefas/alterar/{id}",
     ([FromServices] AppDataContext ctx,
     [FromRoute] string id) =>
@@ -84,16 +85,33 @@ app.MapPatch("/tarefas/alterar/{id}",
     return Results.Ok(tarefa);
 });
 
-//GET: http://localhost:5273/tarefas/naoconcluidas
+//GET: http://localhost:5000/tarefas/naoconcluidas
 app.MapGet("/tarefas/naoconcluidas", ([FromServices] AppDataContext ctx) =>
 {
-    //Implementar a listagem de tarefas não concluídas
+    var tarefas = ctx.Tarefas
+        .Where(t => t.Status == "Não iniciada" || t.Status == "Em andamento")
+        .ToList();
+
+    if (tarefas.Any())
+    {
+        return Results.Ok(tarefas);
+    }
+    return Results.NotFound("Nenhuma tarefa com status 'Não iniciada' ou 'Em andamento' encontrada");
 });
 
-//GET: http://localhost:5273/tarefas/concluidas
+//GET: http://localhost:5000/tarefas/concluidas
 app.MapGet("/tarefas/concluidas", ([FromServices] AppDataContext ctx) =>
 {
-    //Implementar a listagem de tarefas concluídas
+    var tarefas = ctx.Tarefas
+        .Where(t => t.Status == "Concluído")
+        .ToList();
+
+    if (tarefas.Any())
+    {
+        return Results.Ok(tarefas);
+    }
+    return Results.NotFound("Nenhuma tarefa com status 'Concluído' encontrada");
+
 });
 
 app.UseCors("AcessoTotal");
